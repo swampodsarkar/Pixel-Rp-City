@@ -206,44 +206,8 @@ export const World = () => {
           </group>
         ))}
 
-        {/* MISSION MARKER */}
-        <MissionMarker />
-
         {/* SHOT EFFECTS */}
         <ShotEffects />
-    </group>
-  );
-};
-
-const MissionMarker = () => {
-  const mission = useGameStore((s) => s.mission);
-  if (!mission.active) return null;
-
-  return (
-    <group position={[mission.targetX, 0, mission.targetZ]}>
-      <mesh position={[0, 2, 0]}>
-        <cylinderGeometry args={[0.3, 0.3, 4, 8]} />
-        <meshStandardMaterial color="#4f46e5" emissive="#4f46e5" emissiveIntensity={0.5} />
-      </mesh>
-      <mesh position={[0, 4.5, 0]}>
-        <sphereGeometry args={[0.6, 8, 8]} />
-        <meshStandardMaterial color="#4f46e5" emissive="#4f46e5" emissiveIntensity={1} />
-      </mesh>
-      <Html position={[0, 5.5, 0]} center>
-        <div style={{
-          background: 'rgba(79,70,229,0.8)',
-          color: '#fff',
-          fontSize: '10px',
-          fontWeight: 'bold',
-          padding: '2px 8px',
-          borderRadius: '4px',
-          whiteSpace: 'nowrap',
-          fontFamily: 'monospace',
-          pointerEvents: 'none',
-        }}>
-          {mission.title}
-        </div>
-      </Html>
     </group>
   );
 };

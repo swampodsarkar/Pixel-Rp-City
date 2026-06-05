@@ -32,6 +32,9 @@ export const Player = ({ isActive, myId, initialPosition = [0, 0, 0] }: { isActi
   const lastShot = useGameStore((state) => state.lastShot);
   const setLastShot = useGameStore((state) => state.setLastShot);
   const setMoney = useGameStore((state) => state.setMoney);
+  const racePhase = useGameStore((s) => s.racePhase);
+  const raceStart = useGameStore((s) => s.raceStart);
+  const raceFinish = useGameStore((s) => s.raceFinish);
 
   const myPlayerData = useMultiplayerStore((s) => myId ? s.players[myId] : null);
   const allPlayers = useMultiplayerStore((s) => s.players);
@@ -51,6 +54,14 @@ export const Player = ({ isActive, myId, initialPosition = [0, 0, 0] }: { isActi
     }
     previousDrivingVehicle.current = drivingVehicle;
   }, [drivingVehicle, updateCar]);
+
+  // Race teleport
+  useEffect(() => {
+    if (racePhase === 'countdown' && raceStart && groupRef.current) {
+      groupRef.current.position.x = raceStart.x;
+      groupRef.current.position.z = raceStart.z;
+    }
+  }, [racePhase, raceStart]);
 
   const { camera } = useThree();
 
@@ -161,6 +172,7 @@ export const Player = ({ isActive, myId, initialPosition = [0, 0, 0] }: { isActi
     // Sync weapon to Firebase
     const currentWeapon = useGameStore.getState().weapon;
     const canFire = currentWeapon.equipped && (currentWeapon.ammo[currentWeapon.equipped] ?? 0) > 0;
+    const racePhaseNow = useGameStore.getState().racePhase;
 
     const joystick = useGameStore.getState().joystick;
     const isSprintingStore = useGameStore.getState().isSprinting;
@@ -172,6 +184,12 @@ export const Player = ({ isActive, myId, initialPosition = [0, 0, 0] }: { isActi
     if (keys.s || keys.arrowdown) dz += 1;
     if (keys.a || keys.arrowleft) dx -= 1;
     if (keys.d || keys.arrowright) dx += 1;
+
+    // Lock movement during race countdown
+    if (racePhaseNow === 'countdown') {
+      dx = 0;
+      dz = 0;
+    }
 
     const hasInput = Math.abs(dx) > 0.01 || Math.abs(dz) > 0.01;
     const isSprinting = isSprintingStore || (keys.shift && hasInput);

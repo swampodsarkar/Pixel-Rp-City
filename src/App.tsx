@@ -16,9 +16,9 @@ import { PlayerList } from './components/PlayerList';
 import { HealthBar } from './components/HealthBar';
 import { HelpPanel } from './components/HelpPanel';
 import { WeaponHUD } from './components/WeaponHUD';
-import { MissionHUD } from './components/MissionHUD';
 import { GarageUI } from './components/GarageUI';
 import { AdminPanel } from './components/AdminPanel';
+import { RaceUI } from './components/RaceUI';
 import { joinGame, leaveGame, listenToCars, listenToServers, initServers, ServerInfo, useMultiplayerStore } from './multiplayer';
 import { initVoice, leaveVoice } from './voice';
 
@@ -129,8 +129,8 @@ export default function App() {
       {/* WEAPON HUD */}
       {isJoined && <WeaponHUD />}
 
-      {/* MISSION HUD */}
-      {isJoined && <MissionHUD />}
+      {/* RACE UI */}
+      {isJoined && <RaceUI />}
 
       {/* GARAGE UI */}
       {isJoined && <GarageUI />}

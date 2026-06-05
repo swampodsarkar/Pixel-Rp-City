@@ -32,17 +32,6 @@ export interface WeaponState {
   ammo: Record<string, number>;
 }
 
-export interface MissionState {
-  active: boolean;
-  type: 'delivery' | 'race' | 'cargo' | null;
-  title: string;
-  description: string;
-  targetX: number;
-  targetZ: number;
-  reward: number;
-  progress: number;
-}
-
 interface GameStore {
   zoom: number;
   setZoom: (z: number | ((prev: number) => number)) => void;
@@ -65,16 +54,24 @@ interface GameStore {
   setWeapon: (weapon: WeaponState) => void;
   lastShot: number;
   setLastShot: (t: number) => void;
-  mission: MissionState;
-  setMission: (mission: MissionState) => void;
   ownedCars: string[];
   addOwnedCar: (id: string) => void;
   showGarage: boolean;
-  setShowGarage: (s: boolean) => void;
+  setShowGarage: (s: boolean | ((prev: boolean) => boolean)) => void;
   isAdmin: boolean;
   setIsAdmin: (a: boolean) => void;
   cars: CarData[];
   updateCar: (id: string, updates: Partial<CarData>) => void;
+  racePhase: 'idle' | 'challenged' | 'countdown' | 'racing' | 'finished';
+  setRacePhase: (p: 'idle' | 'challenged' | 'countdown' | 'racing' | 'finished') => void;
+  raceStart: { x: number; z: number } | null;
+  setRaceStart: (p: { x: number; z: number } | null) => void;
+  raceFinish: { x: number; z: number } | null;
+  setRaceFinish: (p: { x: number; z: number } | null) => void;
+  raceCountdown: number;
+  setRaceCountdown: (n: number) => void;
+  raceWinner: { id: string; name: string } | null;
+  setRaceWinner: (w: { id: string; name: string } | null) => void;
 }
 
 export const useGameStore = create<GameStore>((set) => ({
@@ -106,22 +103,28 @@ export const useGameStore = create<GameStore>((set) => ({
   setWeapon: (weapon) => set({ weapon }),
   lastShot: 0,
   setLastShot: (t) => set({ lastShot: t }),
-  mission: {
-    active: false, type: null, title: '',
-    description: '', targetX: 0, targetZ: 0,
-    reward: 0, progress: 0
-  },
-  setMission: (mission) => set({ mission }),
   ownedCars: [],
   addOwnedCar: (id) => set((state) => ({
     ownedCars: state.ownedCars.includes(id) ? state.ownedCars : [...state.ownedCars, id]
   })),
   showGarage: false,
-  setShowGarage: (s) => set({ showGarage: s }),
+  setShowGarage: (s) => set((state) => ({
+    showGarage: typeof s === 'function' ? (s as (prev: boolean) => boolean)(state.showGarage) : s
+  })),
   isAdmin: false,
   setIsAdmin: (a) => set({ isAdmin: a }),
   cars: initialCars,
   updateCar: (id, updates) => set((state) => ({
     cars: state.cars.map(c => c.id === id ? { ...c, ...updates } : c)
   })),
+  racePhase: 'idle',
+  setRacePhase: (racePhase) => set({ racePhase }),
+  raceStart: null,
+  setRaceStart: (raceStart) => set({ raceStart }),
+  raceFinish: null,
+  setRaceFinish: (raceFinish) => set({ raceFinish }),
+  raceCountdown: 0,
+  setRaceCountdown: (raceCountdown) => set({ raceCountdown }),
+  raceWinner: null,
+  setRaceWinner: (raceWinner) => set({ raceWinner }),
 }));
