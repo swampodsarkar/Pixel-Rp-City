@@ -159,11 +159,11 @@ export const World = () => {
 
         {/* Endless intersecting roads across the entire map */}
         <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.05, 0]} receiveShadow>
-          <planeGeometry args={[90, 8000]} />
+          <planeGeometry args={[40, 8000]} />
           <meshStandardMaterial color="#3f3f46" />
         </mesh>
         <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.06, 0]} receiveShadow>
-          <planeGeometry args={[8000, 90]} />
+          <planeGeometry args={[8000, 40]} />
           <meshStandardMaterial color="#3f3f46" />
         </mesh>
 
