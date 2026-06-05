@@ -65,9 +65,9 @@ export const mapConfig = (() => {
             } else if (gx > 0 && gz > 0) {
                 // CITY (South-East)
                 if (h > 0.3) {
-                    const scaleY = 10 + h * 30; // Tall buildings
-                    const sx = 10 + h * 8;
-                    const sz = 10 + hash(gz, gx) * 8;
+                    const scaleY = 25 + h * 50; // Tall buildings (2x)
+                    const sx = 14 + h * 10;
+                    const sz = 14 + hash(gz, gx) * 10;
                     const s = new THREE.Vector3(sx, scaleY, sz);
                     const matrix = new THREE.Matrix4();
                     matrix.compose(new THREE.Vector3(cx, scaleY / 2, cz), q, s);
@@ -79,9 +79,9 @@ export const mapConfig = (() => {
                 // VILLAGE / COUNTRYSIDE (West)
                 if (h > 0.8) {
                     // Village House
-                    const scaleY = 3 + h * 2; 
-                    const sx = 12;
-                    const sz = 12;
+                    const scaleY = 6 + h * 5; 
+                    const sx = 18;
+                    const sz = 18;
                     const s = new THREE.Vector3(sx, scaleY, sz);
                     const matrix = new THREE.Matrix4();
                     matrix.compose(new THREE.Vector3(cx, scaleY / 2, cz), q, s);

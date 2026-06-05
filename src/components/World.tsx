@@ -106,9 +106,9 @@ export const World = () => {
     return geo;
   }, []);
   
-  const trunkGeo = useMemo(() => new THREE.CylinderGeometry(0.5, 0.7, 1, 8), []);
+  const trunkGeo = useMemo(() => new THREE.CylinderGeometry(0.8, 1.2, 2, 8), []);
   const trunkMat = useMemo(() => new THREE.MeshStandardMaterial({ color: '#78350f' }), []);
-  const leavesGeo = useMemo(() => new THREE.ConeGeometry(2.5, 4, 8), []);
+  const leavesGeo = useMemo(() => new THREE.ConeGeometry(4, 6, 8), []);
   const leavesMat = useMemo(() => new THREE.MeshStandardMaterial({ color: '#15803d' }), []);
   
   // Create a canvas texture for city buildings (fake windows)

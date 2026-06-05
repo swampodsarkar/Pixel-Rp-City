@@ -214,7 +214,7 @@ export const Player = ({ isActive, myId, initialPosition = [0, 0, 0] }: { isActi
       const nextX = groupRef.current.position.x + Math.sin(currentRot) * newSpeed * delta;
       const nextZ = groupRef.current.position.z + Math.cos(currentRot) * newSpeed * delta;
 
-      const radius = drivingVehicle ? 3.0 : 1.0;
+      const radius = drivingVehicle ? 4.5 : 1.0;
       if (!checkCollision(nextX, nextZ, radius)) {
         groupRef.current.position.x = nextX;
         groupRef.current.position.z = nextZ;
@@ -255,7 +255,7 @@ export const Player = ({ isActive, myId, initialPosition = [0, 0, 0] }: { isActi
     // Vehicle interaction check
     if (!drivingVehicle) {
       let nearestCar = null;
-      let minDist = 8;
+      let minDist = 12;
 
       const cars = useGameStore.getState().cars;
       for (const car of cars) {

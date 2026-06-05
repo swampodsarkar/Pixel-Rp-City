@@ -1,7 +1,7 @@
 import React from 'react';
 
 export const RealisticCar = ({ color = "#ef4444" }: { color?: string }) => (
-  <group position={[0, 0.4, 0]}>
+  <group position={[0, 0.4, 0]} scale={1.5}>
     {/* Main Chassis */}
     <mesh castShadow position={[0, 0.8, 0]}>
       <boxGeometry args={[2.2, 0.6, 4.8]} />
@@ -15,22 +15,18 @@ export const RealisticCar = ({ color = "#ef4444" }: { color?: string }) => (
     </mesh>
 
     {/* Windows */}
-    {/* Front windshield */}
     <mesh position={[0, 1.4, 0.81]} rotation={[0.4, 0, 0]}>
       <planeGeometry args={[1.6, 0.8]} />
       <meshStandardMaterial color="#111827" roughness={0.1} metalness={0.8} />
     </mesh>
-    {/* Rear windshield */}
     <mesh position={[0, 1.4, -1.61]} rotation={[-0.4, 0, 0]}>
       <planeGeometry args={[1.6, 0.8]} />
       <meshStandardMaterial color="#111827" roughness={0.1} metalness={0.8} />
     </mesh>
-    {/* Side windows right */}
     <mesh position={[0.91, 1.4, -0.4]} rotation={[0, Math.PI/2, 0]}>
       <planeGeometry args={[2.4, 0.6]} />
       <meshStandardMaterial color="#111827" roughness={0.1} metalness={0.8} />
     </mesh>
-    {/* Side windows left */}
     <mesh position={[-0.91, 1.4, -0.4]} rotation={[0, -Math.PI/2, 0]}>
       <planeGeometry args={[2.4, 0.6]} />
       <meshStandardMaterial color="#111827" roughness={0.1} metalness={0.8} />
