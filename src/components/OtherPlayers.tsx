@@ -127,7 +127,7 @@ const RemotePlayer = ({ player }: { player: any }) => {
             </group>
           </group>
         ) : (
-          <RealisticCar color={drivingVehicle.color} />
+          <RealisticCar color={drivingVehicle.color} type={drivingVehicle.type} />
         )}
       </group>
     </group>

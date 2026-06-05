@@ -86,7 +86,7 @@ const ParkedCars = () => {
         
         return (
           <group key={car.id} position={[car.x, 0, car.z]}>
-            <RealisticCar color={car.color} />
+            <RealisticCar color={car.color} type={car.type} />
           </group>
         );
       })}

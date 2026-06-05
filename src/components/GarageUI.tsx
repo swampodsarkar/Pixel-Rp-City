@@ -3,10 +3,10 @@ import { syncCarPosition } from "../multiplayer";
 import { Car, X } from "lucide-react";
 
 const SPAWNABLE_CARS = [
-  { id: 'spawn1', color: '#ef4444', name: 'Red Bullet' },
-  { id: 'spawn2', color: '#3b82f6', name: 'Blue Streak' },
-  { id: 'spawn3', color: '#10b981', name: 'Green Phantom' },
-  { id: 'spawn4', color: '#eab308', name: 'Gold Cruiser' },
+  { id: 'spawn1', color: '#ef4444', name: 'Red Bullet', type: 'sports' },
+  { id: 'spawn2', color: '#3b82f6', name: 'Blue Streak', type: 'sports' },
+  { id: 'spawn3', color: '#10b981', name: 'Green Phantom', type: 'sedan' },
+  { id: 'spawn4', color: '#eab308', name: 'Gold Cruiser', type: 'sedan' },
 ];
 
 export const GarageUI = () => {
@@ -27,7 +27,7 @@ export const GarageUI = () => {
     // Spawn near player
     const spawnX = 50 + Math.random() * 100;
     const spawnZ = 50 + Math.random() * 100;
-    updateCar(car.id, { x: spawnX, z: spawnZ, color: car.color });
+    updateCar(car.id, { x: spawnX, z: spawnZ, color: car.color, type: car.type });
     syncCarPosition(car.id, spawnX, spawnZ);
   };
 

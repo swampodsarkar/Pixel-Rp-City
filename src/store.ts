@@ -15,16 +15,16 @@ export interface CarData {
 }
 
 const initialCars: CarData[] = [
-  { id: 'car1', x: 20, z: 0, color: '#ef4444', type: 'car' },
-  { id: 'car2', x: -50, z: 50, color: '#3b82f6', type: 'car' },
-  { id: 'car3', x: 100, z: -20, color: '#10b981', type: 'car' },
-  { id: 'car4', x: 10, z: 120, color: '#eab308', type: 'car' },
-  { id: 'car5', x: -100, z: -100, color: '#f97316', type: 'car' },
-  { id: 'car6', x: 200, z: 0, color: '#a855f7', type: 'car' },
-  { id: 'car7', x: -200, z: 50, color: '#ec4899', type: 'car' },
-  { id: 'car8', x: 0, z: 200, color: '#ffffff', type: 'car' },
-  { id: 'car9', x: 0, z: -200, color: '#000000', type: 'car' },
-  { id: 'car10', x: 300, z: 20, color: '#22d3ee', type: 'car' },
+  { id: 'car1', x: 20, z: 0, color: '#ef4444', type: 'sports' },
+  { id: 'car2', x: -50, z: 50, color: '#3b82f6', type: 'sedan' },
+  { id: 'car3', x: 100, z: -20, color: '#ffffff', type: 'police' },
+  { id: 'car4', x: 10, z: 120, color: '#eab308', type: 'taxi' },
+  { id: 'car5', x: -100, z: -100, color: '#ffffff', type: 'ambulance' },
+  { id: 'car6', x: 200, z: 0, color: '#a855f7', type: 'sedan' },
+  { id: 'car7', x: -200, z: 50, color: '#22d3ee', type: 'sports' },
+  { id: 'car8', x: 0, z: 200, color: '#f97316', type: 'truck' },
+  { id: 'car9', x: 0, z: -200, color: '#000000', type: 'sedan' },
+  { id: 'car10', x: 300, z: 20, color: '#10b981', type: 'sports' },
 ];
 
 export interface WeaponState {
