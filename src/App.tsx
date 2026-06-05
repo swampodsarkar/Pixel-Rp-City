@@ -76,7 +76,7 @@ export default function App() {
       {/* Always Render the 3D World over Full Screen */}
       <div className="absolute inset-0 z-0">
         <Canvas shadows dpr={[1, 2]} gl={{ antialias: true, toneMapping: THREE.ACESFilmicToneMapping }}>
-          <OrthographicCamera makeDefault position={[60, 80, 60]} zoom={2.2} near={-10000} far={20000} />
+          <OrthographicCamera makeDefault position={[25, 45, 25]} zoom={5} near={-10000} far={20000} />
           <DayNightCycle />
           {joined && <Player isActive={joined} myId={myId} initialPosition={[spawnPos.x, 0, spawnPos.z]} />}
           <OtherPlayers myId={myId} />
