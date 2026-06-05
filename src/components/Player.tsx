@@ -293,11 +293,12 @@ export const Player = ({ isActive, myId, initialPosition = [0, 0, 0] }: { isActi
       }
     }
 
-    // Fixed isometric camera — closer, angled
+    // Isometric follow camera — fixed angle, follows player
     if (camera instanceof THREE.OrthographicCamera) {
-      camera.position.set(100, 120, 100);
-      camera.lookAt(0, 0, 0);
-      camera.zoom = 1.8;
+      const pos = groupRef.current.position;
+      camera.position.set(pos.x + 60, pos.y + 80, pos.z + 60);
+      camera.lookAt(pos.x, 0, pos.z);
+      camera.zoom = 2.2;
       camera.updateProjectionMatrix();
     }
 
