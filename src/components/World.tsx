@@ -250,11 +250,12 @@ const MissionMarker = () => {
 
 const ShotEffects = () => {
   const [shots, setShots] = useState<ShotData[]>([]);
+  const serverId = useMultiplayerStore(s => s.serverId);
 
   useEffect(() => {
     const unsub = listenToShots((s) => setShots(s));
     return () => unsub();
-  }, []);
+  }, [serverId]);
 
   return (
     <group>

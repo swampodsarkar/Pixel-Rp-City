@@ -7,7 +7,7 @@ import { World } from './components/World';
 import { Player } from './components/Player';
 import { OtherPlayers } from './components/OtherPlayers';
 import { useGameStore } from './store';
-import { Play, Settings, Shield, User } from 'lucide-react';
+import { Play, Settings, Shield, User, Server, ArrowLeft, Users } from 'lucide-react';
 import { MobileControls } from './components/MobileControls';
 import { Speedometer } from './components/Speedometer';
 import { Chat } from './components/Chat';
@@ -19,47 +19,69 @@ import { WeaponHUD } from './components/WeaponHUD';
 import { MissionHUD } from './components/MissionHUD';
 import { GarageUI } from './components/GarageUI';
 import { AdminPanel } from './components/AdminPanel';
-import { joinGame, leaveGame, listenToCars } from './multiplayer';
+import { joinGame, leaveGame, listenToCars, listenToServers, initServers, ServerInfo, useMultiplayerStore } from './multiplayer';
 import { initVoice, leaveVoice } from './voice';
 
 export default function App() {
   const [userName, setUserName] = useState('');
-  const [joined, setJoined] = useState(false);
+  const [phase, setPhase] = useState<'menu' | 'servers' | 'playing'>('menu');
   const [myId, setMyId] = useState<string | null>(null);
   const [spawnPos, setSpawnPos] = useState({ x: 0, z: 0 });
+  const [servers, setServers] = useState<ServerInfo[]>([]);
+  const [serverError, setServerError] = useState('');
   const drivingVehicle = useGameStore(s => s.drivingVehicle);
   const updateCar = useGameStore(s => s.updateCar);
   const setShowGarage = useGameStore(s => s.setShowGarage);
+  const serverId = useMultiplayerStore(s => s.serverId);
 
-  const handlePlay = async () => {
+  useEffect(() => {
+    initServers();
+    const unsub = listenToServers(setServers);
+    return () => unsub();
+  }, []);
+
+  const handlePlay = () => {
     if (!userName.trim()) return;
-    const { id, spawn } = joinGame(userName);
-    setMyId(id);
-    setSpawnPos(spawn);
+    setPhase('servers');
+  };
+
+  const handleJoinServer = async (sid: string) => {
+    setServerError('');
     try {
-      await initVoice(id);
-    } catch (e) {
-      console.error("Agora voice start failed", e);
+      const { id, spawn } = await joinGame(userName.trim(), sid);
+      setMyId(id);
+      setSpawnPos(spawn);
+      try {
+        await initVoice(id);
+      } catch (e) {
+        console.error("Agora voice start failed", e);
+      }
+      setPhase('playing');
+    } catch (e: any) {
+      setServerError(e.message || 'Failed to join server');
     }
-    setJoined(true);
+  };
+
+  const handleBack = () => {
+    setPhase('menu');
   };
 
   useEffect(() => {
-    if (!joined) return;
+    if (phase !== 'playing' || !serverId) return;
     const unsub = listenToCars((cars) => {
       Object.entries(cars).forEach(([carId, pos]) => updateCar(carId, pos));
     });
     return () => unsub();
-  }, [joined, updateCar]);
+  }, [phase, serverId, updateCar]);
 
   useEffect(() => {
-    if (!joined) return;
+    if (phase !== 'playing') return;
     const onKey = (e: KeyboardEvent) => {
       if (e.key.toLowerCase() === 'g') setShowGarage((p: boolean) => !p);
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [joined, setShowGarage]);
+  }, [phase, setShowGarage]);
 
   useEffect(() => {
     return () => {
@@ -70,6 +92,8 @@ export default function App() {
     }
   }, [myId]);
 
+  const isJoined = phase === 'playing';
+
   return (
     <div className="w-screen h-screen overflow-hidden bg-black select-none relative font-sans text-zinc-100">
       
@@ -78,52 +102,48 @@ export default function App() {
         <Canvas shadows dpr={[1, 2]} gl={{ antialias: true, toneMapping: THREE.ACESFilmicToneMapping }}>
           <OrthographicCamera makeDefault position={[8, 20, 8]} zoom={14} near={-10000} far={20000} />
           <DayNightCycle />
-          {joined && <Player isActive={joined} myId={myId} initialPosition={[spawnPos.x, 0, spawnPos.z]} />}
+          {isJoined && <Player isActive={isJoined} myId={myId} initialPosition={[spawnPos.x, 0, spawnPos.z]} />}
           <OtherPlayers myId={myId} />
           <World />
         </Canvas>
       </div>
 
       {/* MOBILE CONTROLS */}
-      {joined && <MobileControls />}
+      {isJoined && <MobileControls />}
 
       {/* CHAT */}
-      {joined && <Chat />}
+      {isJoined && <Chat />}
 
       {/* MINIMAP */}
-      {joined && <Minimap />}
+      {isJoined && <Minimap />}
 
       {/* PLAYER LIST */}
-      {joined && <PlayerList />}
+      {isJoined && <PlayerList />}
 
       {/* HEALTH BAR */}
-      {joined && <HealthBar />}
+      {isJoined && <HealthBar />}
 
       {/* HELP PANEL */}
-      {joined && <HelpPanel />}
+      {isJoined && <HelpPanel />}
 
       {/* WEAPON HUD */}
-      {joined && <WeaponHUD />}
+      {isJoined && <WeaponHUD />}
 
       {/* MISSION HUD */}
-      {joined && <MissionHUD />}
+      {isJoined && <MissionHUD />}
 
       {/* GARAGE UI */}
-      {joined && <GarageUI />}
+      {isJoined && <GarageUI />}
 
       {/* ADMIN PANEL */}
-      {joined && <AdminPanel />}
+      {isJoined && <AdminPanel />}
 
-      {/* MAIN MENU UI — GTA 5 Online Style */}
-      {!joined && (
+      {/* === MAIN MENU === */}
+      {phase === 'menu' && (
         <div className="absolute inset-0 z-20 flex items-center justify-center sm:justify-start">
-          {/* Overlay gradient */}
           <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent" />
-
-          {/* Main Panel */}
           <div className="relative w-full sm:w-[460px] h-[100dvh] bg-gradient-to-b from-zinc-900/95 via-black/95 to-zinc-900/95 sm:border-r border-indigo-500/20 px-8 sm:px-14 flex flex-col justify-center overflow-y-auto animate-slide-in shadow-[4px_0_60px_rgba(0,0,0,0.9)]">
-
-            {/* Top bar: Online count + Version */}
+            {/* Top bar */}
             <div className="absolute top-6 left-8 sm:left-14 right-8 sm:right-14 flex items-center justify-between">
               <div className="flex items-center gap-2 bg-green-500/10 border border-green-500/20 rounded-full px-3 py-1">
                 <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse shadow-[0_0_6px_rgba(74,222,128,0.6)]" />
@@ -132,10 +152,8 @@ export default function App() {
               <p className="text-[10px] text-zinc-600 font-mono tracking-widest">BUILD 1.0.6</p>
             </div>
 
-            {/* Main Content - centered */}
             <div className="flex flex-col gap-1 sm:gap-2 -mt-12">
-              
-              {/* Branding — GTA 5 Style Gradient Logo */}
+              {/* Branding */}
               <div className="mb-2">
                 <h1 className="text-6xl sm:text-8xl font-black italic leading-none tracking-tighter">
                   <span className="bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent drop-shadow-[0_2px_20px_rgba(129,140,248,0.3)]">
@@ -153,10 +171,9 @@ export default function App() {
                 </div>
               </div>
 
-              {/* Character Setup — GTA 5 Mugshot Style */}
+              {/* Character Setup */}
               <div className="mt-6 mb-6 bg-white/[0.03] border border-white/[0.06] rounded-2xl p-5 backdrop-blur-sm">
                 <div className="flex items-center gap-5">
-                  {/* Mugshot */}
                   <div className="relative flex-shrink-0">
                     <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-[0_0_30px_rgba(99,102,241,0.3)] border-2 border-white/10 overflow-hidden">
                       {userName.trim() ? (
@@ -167,13 +184,10 @@ export default function App() {
                         <User size={30} className="text-white/40" />
                       )}
                     </div>
-                    {/* Rank badge */}
                     <div className="absolute -bottom-1 -right-1 bg-zinc-900 border border-yellow-500/40 rounded-full w-7 h-7 flex items-center justify-center shadow-lg">
                       <span className="text-[10px] font-black text-yellow-400">1</span>
                     </div>
                   </div>
-
-                  {/* Name & Stats */}
                   <div className="flex-1 min-w-0">
                     <label className="text-[9px] font-bold text-zinc-500 uppercase tracking-[0.2em] mb-1.5 block">
                       Character Name
@@ -188,7 +202,6 @@ export default function App() {
                       autoFocus
                       maxLength={12}
                     />
-                    {/* Money row */}
                     <div className="flex items-center gap-3 mt-2 text-[11px]">
                       <div className="flex items-center gap-1 text-yellow-400">
                         <span className="text-[10px]">$</span>
@@ -201,19 +214,18 @@ export default function App() {
                 </div>
               </div>
 
-              {/* Navigation Actions — GTA 5 Style */}
+              {/* Navigation Actions */}
               <div className="flex flex-col gap-2.5">
                 <button 
                   disabled={!userName.trim()}
                   onClick={handlePlay}
                   className="group relative flex items-center gap-4 px-6 py-4 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-black uppercase tracking-widest text-lg rounded-xl transition-all duration-300 disabled:opacity-30 disabled:from-zinc-800 disabled:to-zinc-800 disabled:cursor-not-allowed shadow-[0_4px_20px_rgba(99,102,241,0.3)] hover:shadow-[0_4px_30px_rgba(99,102,241,0.5)] overflow-hidden"
                 >
-                  {/* Shine effect */}
                   <div className="absolute inset-0 bg-[linear-gradient(120deg,transparent_30%,rgba(255,255,255,0.1)_50%,transparent_70%)] group-hover:translate-x-full transition-transform duration-700" />
                   <Play size={22} className="relative z-10 group-hover:scale-110 transition-transform" />
                   <span className="relative z-10 tracking-wider italic">Play Online</span>
                   <span className="relative z-10 ml-auto text-[10px] bg-white/10 rounded-full px-3 py-1 font-mono tracking-wider italic">
-                    10 MAX
+                    {servers.reduce((t, s) => t + s.playerCount, 0)} ONLINE
                   </span>
                 </button>
 
@@ -242,8 +254,103 @@ export default function App() {
         </div>
       )}
 
-      {/* TOP RIGHT HUD - ONLY SHOW WHEN DRIVING OR JOINED */}
-      {joined && (
+      {/* === SERVER BROWSER === */}
+      {phase === 'servers' && (
+        <div className="absolute inset-0 z-20 flex items-center justify-center">
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+          <div className="relative w-full max-w-2xl mx-4 bg-gradient-to-b from-zinc-900/95 via-black/95 to-zinc-900/95 border border-indigo-500/20 rounded-2xl px-8 py-8 shadow-[0_0_60px_rgba(0,0,0,0.9)] animate-fade-in">
+            
+            {/* Header */}
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-3">
+                <button onClick={handleBack} className="p-2 hover:bg-white/10 rounded-lg transition-colors">
+                  <ArrowLeft size={20} className="text-zinc-400" />
+                </button>
+                <div>
+                  <h2 className="text-2xl font-black italic tracking-tight">
+                    <span className="bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">
+                      SELECT SERVER
+                    </span>
+                  </h2>
+                  <p className="text-[10px] text-zinc-600 font-mono tracking-widest mt-1">
+                    {userName} — CHOOSE YOUR WORLD
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {serverError && (
+              <div className="mb-4 px-4 py-3 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400 text-sm font-bold">
+                {serverError}
+              </div>
+            )}
+
+            {/* Server List */}
+            <div className="flex flex-col gap-3 max-h-[60vh] overflow-y-auto pr-2">
+              {servers.map((server) => (
+                <button
+                  key={server.id}
+                  onClick={() => handleJoinServer(server.id)}
+                  disabled={server.playerCount >= server.maxPlayers}
+                  className="group flex items-center gap-5 w-full p-5 bg-white/[0.03] hover:bg-white/[0.07] border border-white/[0.06] hover:border-indigo-500/30 rounded-xl transition-all duration-300 disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                  {/* Server Icon */}
+                  <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-gradient-to-br from-indigo-500/20 to-purple-600/20 border border-white/10 flex items-center justify-center">
+                    <Server size={24} className="text-indigo-400" />
+                  </div>
+
+                  {/* Server Info */}
+                  <div className="flex-1 text-left">
+                    <h3 className="text-lg font-bold text-white tracking-wide group-hover:text-indigo-300 transition-colors">
+                      {server.name}
+                    </h3>
+                    <div className="flex items-center gap-2 mt-1">
+                      <div className={`w-2 h-2 rounded-full ${server.playerCount < server.maxPlayers ? 'bg-green-400' : 'bg-red-400'} animate-pulse`} />
+                      <span className="text-xs text-zinc-500 font-mono">
+                        {server.playerCount < server.maxPlayers ? 'OPEN' : 'FULL'}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Player Count */}
+                  <div className="flex items-center gap-2 px-4 py-2 bg-zinc-800/50 rounded-xl border border-white/5">
+                    <Users size={16} className="text-zinc-500" />
+                    <span className="font-bold text-white font-mono text-sm">
+                      {server.playerCount}
+                    </span>
+                    <span className="text-zinc-600 font-mono text-xs">/ {server.maxPlayers}</span>
+                  </div>
+
+                  {/* Join arrow */}
+                  <div className="text-zinc-600 group-hover:text-indigo-400 group-hover:translate-x-1 transition-all">
+                    <Play size={18} />
+                  </div>
+                </button>
+              ))}
+
+              {servers.length === 0 && (
+                <div className="text-center py-12">
+                  <Server size={40} className="mx-auto text-zinc-700 mb-3" />
+                  <p className="text-zinc-600 font-mono text-sm">Loading servers...</p>
+                </div>
+              )}
+            </div>
+
+            {/* Footer */}
+            <div className="mt-6 pt-4 border-t border-white/5 flex items-center justify-between">
+              <span className="text-[10px] text-zinc-700 font-mono">
+                {servers.reduce((t, s) => t + s.playerCount, 0)} PLAYERS ONLINE
+              </span>
+              <span className="text-[10px] text-zinc-700 font-mono">
+                10 MAX PER SERVER
+              </span>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* TOP RIGHT HUD */}
+      {isJoined && (
         <div className="absolute top-4 right-4 z-10 pointer-events-none drop-shadow-md flex flex-col items-end">
           <div className="bg-black/40 backdrop-blur-md border border-white/10 px-4 py-2 rounded-xl flex items-center gap-3">
             <h1 className="font-bold tracking-widest text-[10px] text-zinc-400 uppercase italic">Online</h1>

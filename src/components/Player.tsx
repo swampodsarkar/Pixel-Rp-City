@@ -368,9 +368,9 @@ export const Player = ({ isActive, myId, initialPosition = [0, 0, 0] }: { isActi
               <meshStandardMaterial color="#fef08a" emissive="#fef08a" emissiveIntensity={2} />
             </mesh>
           </group>
-        ) : drivingVehicle?.type === 'car' ? (
+        ) : (
           <RealisticCar color={drivingVehicle.color} type={drivingVehicle.type} />
-        ) : null}
+        )}
       </group>
     </group>
   );

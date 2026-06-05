@@ -1,5 +1,6 @@
 import { ref, push, set, onValue } from "firebase/database";
 import { db } from "./firebase";
+import { useMultiplayerStore } from "./multiplayer";
 
 export interface ChatMessage {
   id: string;
@@ -16,7 +17,9 @@ export const sendChatMessage = (
   senderColor: string,
   text: string
 ) => {
-  const msgRef = push(ref(db, "messages"));
+  const serverId = useMultiplayerStore.getState().serverId;
+  if (!serverId) return;
+  const msgRef = push(ref(db, `servers/${serverId}/messages`));
   set(msgRef, {
     senderId,
     senderName,
@@ -29,7 +32,9 @@ export const sendChatMessage = (
 export const listenToMessages = (
   cb: (messages: ChatMessage[]) => void
 ) => {
-  const messagesRef = ref(db, "messages");
+  const serverId = useMultiplayerStore.getState().serverId;
+  if (!serverId) return () => {};
+  const messagesRef = ref(db, `servers/${serverId}/messages`);
   return onValue(messagesRef, (snapshot) => {
     const data = snapshot.val();
     if (!data) {

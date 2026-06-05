@@ -12,11 +12,12 @@ export const Chat = () => {
   const players = useMultiplayerStore((s) => s.players);
   const myId = useMultiplayerStore((s) => s.myId);
   const myData = myId ? players[myId] : null;
+  const serverId = useMultiplayerStore((s) => s.serverId);
 
   useEffect(() => {
     const unsub = listenToMessages(setMessages);
     return () => unsub();
-  }, []);
+  }, [serverId]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });

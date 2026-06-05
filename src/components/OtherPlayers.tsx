@@ -2,7 +2,7 @@ import React, { useRef } from 'react';
 import * as THREE from 'three';
 import { useFrame } from '@react-three/fiber';
 import { Html } from '@react-three/drei';
-import { useMultiplayerStore, listenToShots, ShotData } from '../multiplayer';
+import { useMultiplayerStore } from '../multiplayer';
 import { RealisticCar } from './RealisticCar';
 import { useGameStore } from '../store';
 import { WEAPONS } from '../weapons';
