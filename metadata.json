@@ -1,0 +1,6 @@
+{
+  "name": "Neo Pixel City",
+  "description": "Multiplayer 3D game with spatial voice chat",
+  "requestFramePermissions": ["microphone"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
