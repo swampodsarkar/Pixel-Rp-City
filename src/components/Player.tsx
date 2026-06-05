@@ -318,51 +318,54 @@ export const Player = ({ isActive, myId, initialPosition = [0, 0, 0] }: { isActi
       <group ref={bodyRotRef}>
         {!drivingVehicle ? (
           <group>
-            <group position={[0, 1.2, 0]}>
-              <mesh position={[0, 0.6, 0]} castShadow>
-                <cylinderGeometry args={[0.4, 0.4, 1.2, 16]} />
+            {/* Legs */}
+            <group ref={leftLegRef} position={[-0.15, 0.35, 0]}>
+              <mesh castShadow>
+                <cylinderGeometry args={[0.12, 0.12, 0.7, 8]} />
+                <meshStandardMaterial color="#1e3a8a" />
+              </mesh>
+            </group>
+            <group ref={rightLegRef} position={[0.15, 0.35, 0]}>
+              <mesh castShadow>
+                <cylinderGeometry args={[0.12, 0.12, 0.7, 8]} />
+                <meshStandardMaterial color="#1e3a8a" />
+              </mesh>
+            </group>
+
+            {/* Body */}
+            <group position={[0, 0.7, 0]}>
+              <mesh position={[0, 0.35, 0]} castShadow>
+                <cylinderGeometry args={[0.3, 0.35, 0.7, 12]} />
                 <meshStandardMaterial color={playerColor} />
               </mesh>
-              <mesh position={[0, 1.6, 0]} castShadow>
-                <sphereGeometry args={[0.35, 16, 16]} />
+              {/* Head */}
+              <mesh position={[0, 0.9, 0]} castShadow>
+                <sphereGeometry args={[0.22, 12, 12]} />
                 <meshStandardMaterial color="#ffcaca" />
               </mesh>
 
-              <group ref={leftArmRef} position={[-0.6, 1.0, 0]}>
-                <mesh position={[0, -0.5, 0]} castShadow>
-                  <cylinderGeometry args={[0.15, 0.15, 1.0, 16]} />
+              {/* Arms */}
+              <group ref={leftArmRef} position={[-0.4, 0.5, 0]}>
+                <mesh castShadow>
+                  <cylinderGeometry args={[0.1, 0.1, 0.6, 8]} />
                   <meshStandardMaterial color={playerColor} />
                 </mesh>
               </group>
-              <group ref={rightArmRef} position={[0.6, 1.0, 0]}>
-                <mesh position={[0, -0.5, 0]} castShadow>
-                  <cylinderGeometry args={[0.15, 0.15, 1.0, 16]} />
+              <group ref={rightArmRef} position={[0.4, 0.5, 0]}>
+                <mesh castShadow>
+                  <cylinderGeometry args={[0.1, 0.1, 0.6, 8]} />
                   <meshStandardMaterial color={playerColor} />
                 </mesh>
-                {/* Weapon model */}
                 {weapon.equipped && (
-                  <mesh position={[0, -0.3, -0.5]} rotation={[0, 0, -Math.PI / 2]}>
-                    <boxGeometry args={[0.5, 0.1, 0.1]} />
+                  <mesh position={[0, -0.2, -0.3]} rotation={[0, 0, -Math.PI / 2]}>
+                    <boxGeometry args={[0.35, 0.08, 0.08]} />
                     <meshStandardMaterial color={WEAPONS[weapon.equipped]?.color || '#888'} />
                   </mesh>
                 )}
               </group>
             </group>
 
-            <group ref={leftLegRef} position={[-0.2, 1.2, 0]}>
-              <mesh position={[0, -0.6, 0]} castShadow>
-                <cylinderGeometry args={[0.2, 0.2, 1.2, 16]} />
-                <meshStandardMaterial color="#1e3a8a" />
-              </mesh>
-            </group>
-            <group ref={rightLegRef} position={[0.2, 1.2, 0]}>
-              <mesh position={[0, -0.6, 0]} castShadow>
-                <cylinderGeometry args={[0.2, 0.2, 1.2, 16]} />
-                <meshStandardMaterial color="#1e3a8a" />
-              </mesh>
-            </group>
-
-            {/* Bullet mesh */}
+            {/* Bullet */}
             <mesh ref={bulletRef} visible={false} position={[0, 1.5, 0]}>
               <sphereGeometry args={[0.1, 8, 8]} />
               <meshStandardMaterial color="#fef08a" emissive="#fef08a" emissiveIntensity={2} />
